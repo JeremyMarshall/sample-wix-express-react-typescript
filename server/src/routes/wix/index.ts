@@ -1,12 +1,14 @@
 import { Request, Response, Router } from 'express';
 import { BAD_REQUEST, CREATED, OK } from 'http-status-codes';
 import { ParamsDictionary } from 'express-serve-static-core';
+import path from 'path';
 
 import WixConfig from '../../entities/WixConfig';
 
 // import UserDao from '@daos/User/UserDao.mock';
 import { paramMissingError } from '@shared/constants';
 import { receiveMessageOnPort } from 'worker_threads';
+import Axios from 'axios';
 
 // Init shared
 const router = Router();
@@ -55,15 +57,28 @@ router.get('/login', async (req, res) => {
         console.log("=============================");
 
         const instance = await WixConfig.getAppInstance(refreshToken);
-
-        const url = `https://www.wix.com/_api/site-apps/v1/site-apps/token-received?${accessToken}`;
-        console.log("=============================");
-        console.log(`redirect login ${url}`);
-
         // TODO: Save the instanceId and tokens for future API calls
 
-        // need to post https://www.wix.com/app-oauth-installation/token-received to notif wix that we finished getting the token
-        res.redirect(url);
+        // need to post https://www.wix.com/app-oauth-installation/token-received to notify wix that we finished getting the token
+        const url = `https://www.wix.com/_api/site-apps/v1/site-apps/token-received?${accessToken}`;
+        // res.redirect(url);
+
+        // or post to here to complete the oauth flow
+        // and carry on
+        // this gave a forbidden message
+        // Axios.post('https://www.wix.com/_api/site-apps/v1/site-apps/token-received', {
+        //     headers: {'Authorization': authorizationCode}
+        // })
+
+        Axios.get(url)
+        .then((response) => {
+            res.sendFile('thanks.html', {root: path.join(__dirname, 'views')});
+        })
+        .catch((error) => {
+            console.log(error);
+            res.sendFile('error.html', {root: path.join(__dirname, 'views')});
+        })
+
 
     } catch (wixError) {
         console.log("Error getting token from Wix");
