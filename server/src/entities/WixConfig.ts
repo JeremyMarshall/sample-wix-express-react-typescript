@@ -13,8 +13,14 @@ class WixConfig {
 
     private constructor() {
         this.appId = process.env.APP_ID;
-        this.publicKey = process.env.APP_ID;
-        this.secret = process.env.APP_ID;
+        this.secret = process.env.SECRET;
+
+        const publicKey = process.env.PUBLIC_KEY as string
+        const buf = Buffer.from(publicKey.replace(/-/g, '+').replace(/_/g, '/'), 'base64')
+        this.publicKey =  buf.toString('utf8');
+
+        console.log("====public key========");
+        console.log(this.publicKey);
     }
 
     public static get Instance() {

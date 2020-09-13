@@ -9,11 +9,10 @@ import 'express-async-errors';
 
 import BaseRouter from './routes';
 import logger from '@shared/Logger';
-
+import cors from "cors";
 
 // Init express
 const app = express();
-
 
 
 /************************************************************************************
@@ -31,6 +30,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // Security
 if (process.env.NODE_ENV === 'production') {
+    app.use(cors()); // does this work?
     app.use(helmet());
 }
 
