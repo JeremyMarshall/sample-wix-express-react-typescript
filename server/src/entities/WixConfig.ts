@@ -1,4 +1,13 @@
 import axios, { AxiosResponse } from 'axios';
+
+interface IWixToken {
+    access_token: string;
+    refresh_token: string;
+}
+
+interface IWixAccessToken {
+    access_token: string;
+}
 class WixConfig {
 
     public appId: string | undefined;
@@ -17,18 +26,15 @@ class WixConfig {
 
         const publicKey = process.env.PUBLIC_KEY as string
         const buf = Buffer.from(publicKey.replace(/-/g, '+').replace(/_/g, '/'), 'base64')
-        this.publicKey =  buf.toString('utf8');
-
-        console.log("====public key========");
-        console.log(this.publicKey);
+        this.publicKey = buf.toString('utf8');
     }
 
     public static get Instance() {
         return this._instance || (this._instance = new this());
     }
 
-    public getTokensFromWix(authCode: string) {
-        return axios.post(`${this.auth_provider_base_url}/access`, {
+    public getTokensFromWix(authCode: string): Promise<IWixToken> {
+        return axios.post<IWixToken>(`${this.auth_provider_base_url}/access`, {
             code: authCode,
             client_secret: this.secret,
             client_id: this.appId,
@@ -36,20 +42,20 @@ class WixConfig {
         }).then((resp) => resp.data);
     }
 
-    private getAccessToken (refreshToken: string) {
-        return axios.post(`${this.auth_provider_base_url}/access`, {
-          refresh_token: refreshToken,
-          client_secret: this.secret,
-          client_id: this.appId,
-          grant_type: "refresh_token",
+    private getAccessToken(refreshToken: string): Promise<IWixAccessToken>{
+        return axios.post<IWixAccessToken>(`${this.auth_provider_base_url}/access`, {
+            refresh_token: refreshToken,
+            client_secret: this.secret,
+            client_id: this.appId,
+            grant_type: "refresh_token",
         }).then((resp) => resp.data);
-      }
+    }
     public async getAppInstance(refreshToken: string) {
         try {
             console.log('getAppInstance with refreshToken = ' + refreshToken);
             console.log("==============================");
-            const { access_token } = await this.getAccessToken(refreshToken);
-            console.log('accessToken = ' + access_token);
+            const token  = await this.getAccessToken(refreshToken);
+            console.log('accessToken = ' + token);
 
             const body = {
                 // *** PUT YOUR PARAMS HERE ***
@@ -57,12 +63,12 @@ class WixConfig {
             };
             const options = {
                 headers: {
-                    authorization: access_token,
+                    authorization: token.access_token,
                 },
             };
             const appInstance = axios.create({
                 baseURL: this.instance_api_url,
-                headers: { authorization: access_token }
+                headers: { authorization: token.access_token }
             });
             const instance = (await appInstance.get('instance', body)).data;
 
@@ -75,4 +81,6 @@ class WixConfig {
     };
 }
 
-export default WixConfig.Instance;
+const WixConfigInstance = WixConfig.Instance;
+
+export { WixConfigInstance };
