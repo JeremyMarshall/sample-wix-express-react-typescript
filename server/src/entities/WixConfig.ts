@@ -1,13 +1,10 @@
 import axios, { AxiosResponse } from 'axios';
+import { Etcd3 } from 'etcd3';
 
-interface IWixToken {
-    access_token: string;
-    refresh_token: string;
-}
+import { WixToken, AppInstance } from '../schema'
 
-interface IWixAccessToken {
-    access_token: string;
-}
+const etcdClient = new Etcd3();
+
 class WixConfig {
 
     public appId: string | undefined;
@@ -29,12 +26,12 @@ class WixConfig {
         this.publicKey = buf.toString('utf8');
     }
 
-    public static get Instance() {
+    public static get Instance(): WixConfig {
         return this._instance || (this._instance = new this());
     }
 
-    public getTokensFromWix(authCode: string): Promise<IWixToken> {
-        return axios.post<IWixToken>(`${this.auth_provider_base_url}/access`, {
+    public getTokensFromWix(authCode: string): Promise<WixToken> {
+        return axios.post<WixToken>(`${this.auth_provider_base_url}/access`, {
             code: authCode,
             client_secret: this.secret,
             client_id: this.appId,
@@ -42,19 +39,19 @@ class WixConfig {
         }).then((resp) => resp.data);
     }
 
-    private getAccessToken(refreshToken: string): Promise<IWixAccessToken>{
-        return axios.post<IWixAccessToken>(`${this.auth_provider_base_url}/access`, {
+    private getAccessToken(refreshToken: string): Promise<WixToken> {
+        return axios.post<WixToken>(`${this.auth_provider_base_url}/access`, {
             refresh_token: refreshToken,
             client_secret: this.secret,
             client_id: this.appId,
             grant_type: "refresh_token",
         }).then((resp) => resp.data);
     }
-    public async getAppInstance(refreshToken: string) {
+    public async getAppInstance(refreshToken: string): Promise<AppInstance> {
         try {
             console.log('getAppInstance with refreshToken = ' + refreshToken);
             console.log("==============================");
-            const token  = await this.getAccessToken(refreshToken);
+            const token = await this.getAccessToken(refreshToken);
             console.log('accessToken = ' + token);
 
             const body = {
@@ -70,13 +67,26 @@ class WixConfig {
                 baseURL: this.instance_api_url,
                 headers: { authorization: token.access_token }
             });
-            const instance = (await appInstance.get('instance', body)).data;
+            const instance = (await appInstance.get<AppInstance>('instance', body)).data;
+
+
+            etcdClient.lease(9 * 60, {autoKeepAlive: false})
+                .put(`${this.appId}/${instance.instance.instanceId}/access_token`)
+                .value(token.access_token)
+                .then(val=> console.log(`written ${this.appId}/${instance.instance.instanceId}/access_token`))
+                .catch( e => console.log(`access_token error ${e}`));
+            etcdClient.put(`${this.appId}/${instance.instance.instanceId}/refresh_token`)
+                .value(token.refresh_token)
+                .then(val=> console.log(`written ${this.appId}/${instance.instance.instanceId}/refresh_token`))
+                .catch( e => console.log(`refresh_token error ${e}`));
+
+            console.log(JSON.stringify(instance));
 
             return instance;
         } catch (e) {
             console.log('error in getAppInstance');
             console.log({ e });
-            return;
+            throw (e);
         }
     };
 }

@@ -25,3 +25,5 @@ yarn-error.log*
 server/dist
 server/logs
 server/src/public/dash/
+
+server/env
