@@ -8,8 +8,7 @@ const Users: React.FC<{}> = () => {
     <div>
       {service.status === 'loading' && <div>Loading...</div>}
       {service.status === 'loaded' &&
-        // console.log(service.payload) &&
-        service.payload.results.map(user => (
+        service.payload.payload.map(user => (
           <div key={user.id}>{user.name}</div>
         ))}
       {service.status === 'error' && (

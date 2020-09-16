@@ -1,20 +1,24 @@
 import { useEffect, useState } from 'react';
 import { Service } from '../types/Service';
 import { IUser } from '../types/IUser';
+import axios from 'axios';
 
 export interface IUsers {
-  results: IUser[];
+  payload: IUser[];
 }
 
+type UsersService = Service<IUsers>;
+
 const useUserService = () => {
-  const [result, setResult] = useState<Service<IUsers>>({
+  const [result, setResult] = useState<UsersService>({
     status: 'loading'
   });
 
   useEffect(() => {
-    fetch('/api/users/all')
-      .then(response=> response.json())
-      .then(response => setResult({ status: 'loaded', payload: {results: response.users }}))
+    axios.get<IUsers>('/api/users/all')
+      .then(response => {
+        setResult({ status: 'loaded', payload: { payload: response.data.payload }  });
+      })
       .catch(error => setResult({ status: 'error', error }));
   }, []);
 

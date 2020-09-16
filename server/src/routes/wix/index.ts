@@ -71,8 +71,6 @@ router.get('/login', async (req, res) => {
             console.log(error);
             res.sendFile('error.html', {root: path.join(__dirname, 'views')});
         })
-
-
     } catch (wixError) {
         console.log("Error getting token from Wix");
         console.log({ wixError });
@@ -81,4 +79,13 @@ router.get('/login', async (req, res) => {
     }
 });
 
+/******************************************************************************
+ *                      "GET /api/wix/instance"
+ ******************************************************************************/
+router.get('/instance', async (req, res) => {
+    const instance = WixConfigInstance.decodeInstance(req.headers.instance as string);
+    res.send(instance);
+});
+    
+    
 export default router;

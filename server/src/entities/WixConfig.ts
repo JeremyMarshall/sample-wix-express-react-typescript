@@ -1,5 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { Etcd3 } from 'etcd3';
+import crypto from 'crypto';
+
 
 import { WixToken, AppInstance } from '../schema'
 
@@ -89,6 +91,34 @@ class WixConfig {
             throw (e);
         }
     };
+
+    public decodeInstance(instance: string): string {
+        try {
+          // spilt the instance into signature and data
+          var pair = instance.split('.');
+          var signature = this.decode(pair[0]);
+          var data = pair[1];
+          // sign the data using hmac-sha1-256
+          var hmac = crypto.createHmac('sha256', this.secret as string);
+          var newSignature = hmac.update(data).digest();
+      
+          console.log(JSON.stringify(signature))
+      
+          console.log(Buffer.from(data, 'base64').toString('ascii'))
+          if (signature === newSignature.toString()) {
+            return JSON.stringify(Buffer.from(data, 'base64').toString('ascii'), undefined, 2)
+          } else {
+            return "401 - Did you connect through wix?";
+          }
+        } catch(error) {
+          return "500 - Did you connect through wix?";    
+        }
+      }
+      private decode(data: string): string {
+        const encoding = 'binary';
+        var buf = new Buffer(data.replace(/-/g, '+').replace(/_/g, '/'), 'base64')
+        return buf.toString(encoding);
+      }
 }
 
 const WixConfigInstance = WixConfig.Instance;

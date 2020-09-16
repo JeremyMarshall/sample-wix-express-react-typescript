@@ -4,7 +4,7 @@ interface ServiceInit {
   interface ServiceLoading {
     status: 'loading';
   }
-  interface ServiceLoaded<T> {
+  export interface ServiceLoaded<T> {
     status: 'loaded';
     payload: T;
   }
