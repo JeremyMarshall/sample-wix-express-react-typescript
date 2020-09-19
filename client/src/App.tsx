@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Users from './components/Users';
+import Tokens from './components/Tokens';
 
 
 function App() {
@@ -10,7 +11,8 @@ function App() {
         <p>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
-        <Users/>
+        <Users />
+        <Tokens />
       </header>
     </div>
   );

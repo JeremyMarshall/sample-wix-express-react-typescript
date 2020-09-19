@@ -5,7 +5,7 @@
     "build": "node build.js && tsc --build tsconfig.prod.json",
     "lint": "tslint --project \"tsconfig.json\"",
     "start": "node -r module-alias/register ./dist --env=production",
-    "start:dev": "nodemon",
+    "start:dev": "ts-node -T -r tsconfig-paths/register ./src",
     "test": "nodemon --config ./spec/nodemon.json"
   },
   "nodemonConfig": {
@@ -22,10 +22,12 @@
     "@daos": "dist/daos",
     "@entities": "dist/entities",
     "@shared": "dist/shared",
-    "@server": "dist/Server"
+    "@server": "dist/Server",
+    "@types": "dist/@types"
   },
   "dependencies": {
     "axios": "^0.20.0",
+    "cockatiel": "^1.0.0",
     "command-line-args": "^5.1.1",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",

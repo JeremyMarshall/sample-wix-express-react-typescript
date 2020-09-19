@@ -10,6 +10,8 @@ import { paramMissingError } from '@shared/constants';
 import { receiveMessageOnPort } from 'worker_threads';
 import Axios from 'axios';
 
+import WixPayloadRouter from './payload';
+
 // Init shared
 const router = Router();
 // const userDao = new UserDao();
@@ -87,5 +89,6 @@ router.get('/instance', async (req, res) => {
     res.send(instance);
 });
     
-    
+router.use('/payload', WixPayloadRouter);
+
 export default router;

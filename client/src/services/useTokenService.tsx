@@ -1,21 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Service } from '../types/Service';
-import { IUser } from '../types/IUser';
+import { Token } from '../schema';
 import API from '../utils/API';
 
-export interface IUsers {
-  payload: IUser[];
+export interface ITokens {
+  payload: Token[];
 }
 
-type UsersService = Service<IUsers>;
+type TokensService = Service<ITokens>;
 
-const useUserService = () => {
-  const [result, setResult] = useState<UsersService>({
+const useTokenService = () => {
+  const [result, setResult] = useState<TokensService>({
     status: 'loading'
   });
 
   useEffect(() => {
-    API.axiosClient.get<IUsers>('users/all')
+    API.axiosClient.get<ITokens>('wix/payload/instance')
       .then(response => {
         setResult({ status: 'loaded', payload: { payload: response.data.payload }  });
       })
@@ -25,4 +25,4 @@ const useUserService = () => {
   return result;
 };
 
-export default useUserService;
+export default useTokenService;

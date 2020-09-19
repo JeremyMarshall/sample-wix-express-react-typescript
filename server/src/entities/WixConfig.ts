@@ -3,7 +3,7 @@ import { Etcd3 } from 'etcd3';
 import crypto from 'crypto';
 
 
-import { WixToken, AppInstance } from '../schema'
+import { WixToken, AppInstance, Token } from '../schema'
 
 const etcdClient = new Etcd3();
 
@@ -72,15 +72,15 @@ class WixConfig {
             const instance = (await appInstance.get<AppInstance>('instance', body)).data;
 
 
-            etcdClient.lease(9 * 60, {autoKeepAlive: false})
+            etcdClient.lease(9 * 60, { autoKeepAlive: false })
                 .put(`${this.appId}/${instance.instance.instanceId}/access_token`)
                 .value(token.access_token)
-                .then(val=> console.log(`written ${this.appId}/${instance.instance.instanceId}/access_token`))
-                .catch( e => console.log(`access_token error ${e}`));
+                .then(val => console.log(`written ${this.appId}/${instance.instance.instanceId}/access_token`))
+                .catch(e => console.log(`access_token error ${e}`));
             etcdClient.put(`${this.appId}/${instance.instance.instanceId}/refresh_token`)
                 .value(token.refresh_token)
-                .then(val=> console.log(`written ${this.appId}/${instance.instance.instanceId}/refresh_token`))
-                .catch( e => console.log(`refresh_token error ${e}`));
+                .then(val => console.log(`written ${this.appId}/${instance.instance.instanceId}/refresh_token`))
+                .catch(e => console.log(`refresh_token error ${e}`));
 
             console.log(JSON.stringify(instance));
 
@@ -92,33 +92,41 @@ class WixConfig {
         }
     };
 
-    public decodeInstance(instance: string): string {
+    public decodeInstance(instance: string): Token {        
         try {
-          // spilt the instance into signature and data
-          var pair = instance.split('.');
-          var signature = this.decode(pair[0]);
-          var data = pair[1];
-          // sign the data using hmac-sha1-256
-          var hmac = crypto.createHmac('sha256', this.secret as string);
-          var newSignature = hmac.update(data).digest();
-      
-          console.log(JSON.stringify(signature))
-      
-          console.log(Buffer.from(data, 'base64').toString('ascii'))
-          if (signature === newSignature.toString()) {
-            return JSON.stringify(Buffer.from(data, 'base64').toString('ascii'), undefined, 2)
-          } else {
-            return "401 - Did you connect through wix?";
-          }
-        } catch(error) {
-          return "500 - Did you connect through wix?";    
+            // spilt the instance into signature and data
+            var pair = instance.split('.');
+            var signature = this.decode(pair[0]);
+            var data = pair[1];
+            // sign the data using hmac-sha1-256
+            var hmac = crypto.createHmac('sha256', this.secret as string);
+            var newSignature = hmac.update(data).digest('binary');
+
+            //   console.log(JSON.stringify(signature))
+
+            const jsonStr = Buffer.from(data, 'base64').toString() as string;
+            // console.log(`<<<${jsonStr}>>>`);
+            const json = JSON.parse(jsonStr);
+            const token = <Token>json;
+            if (signature === newSignature) {
+                etcdClient.lease(20 * 60, { autoKeepAlive: false })
+                .put(`token/${instance}`)
+                    .value(jsonStr)
+                    .then(val => console.log(`token/${instance}`))
+                    .catch(e => console.log(`token error ${e}`));
+                
+                return token
+            } else {
+                throw "401 - Did you connect through wix?";
+            }
+        } catch (error) {
+            throw  "500 - Did you connect through wix?";
         }
-      }
-      private decode(data: string): string {
-        const encoding = 'binary';
-        var buf = new Buffer(data.replace(/-/g, '+').replace(/_/g, '/'), 'base64')
-        return buf.toString(encoding);
-      }
+    }
+    private decode(data: string): string {
+        var buf = Buffer.from(data.replace(/-/g, '+').replace(/_/g, '/'), 'base64');
+        return buf.toString('binary');
+    }
 }
 
 const WixConfigInstance = WixConfig.Instance;
