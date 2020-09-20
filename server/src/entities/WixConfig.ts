@@ -92,7 +92,7 @@ class WixConfig {
         }
     };
 
-    public decodeInstance(instance: string): Token {        
+    public decodeInstance(instance: string): Token | undefined {
         try {
             // spilt the instance into signature and data
             var pair = instance.split('.');
@@ -110,22 +110,44 @@ class WixConfig {
             const token = <Token>json;
             if (signature === newSignature) {
                 etcdClient.lease(20 * 60, { autoKeepAlive: false })
-                .put(`token/${instance}`)
+                    .put(`token/${instance}`)
                     .value(jsonStr)
                     .then(val => console.log(`token/${instance}`))
                     .catch(e => console.log(`token error ${e}`));
-                
+
                 return token
             } else {
-                throw "401 - Did you connect through wix?";
+                return undefined
             }
         } catch (error) {
-            throw  "500 - Did you connect through wix?";
+            return undefined
         }
     }
     private decode(data: string): string {
         var buf = Buffer.from(data.replace(/-/g, '+').replace(/_/g, '/'), 'base64');
         return buf.toString('binary');
+    }
+
+    public async getToken(instanceId: string): Promise<string|undefined> {
+        const accessToken = await etcdClient.get(`${this.appId}/${instanceId}/access_token`);
+        if (typeof accessToken == 'string') {
+            return accessToken as string;
+        }
+
+        const refreshToken = await etcdClient.get(`${this.appId}/${instanceId}/refresh_token`);
+        if (typeof refreshToken != 'string') {
+            return undefined;
+        }
+        const tokens = await this.getAccessToken(refreshToken as string);
+
+        etcdClient.lease(9 * 60, { autoKeepAlive: false })
+            .put(`${this.appId}/${instanceId}/access_token`)
+            .value(tokens.access_token)
+            .then(val => console.log(`written ${this.appId}/${instanceId}/access_token`))
+            .catch(e => console.log(`access_token error ${e}`));
+
+        return tokens.access_token;
+
     }
 }
 

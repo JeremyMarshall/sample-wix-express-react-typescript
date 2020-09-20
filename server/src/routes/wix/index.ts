@@ -21,7 +21,7 @@ const router = Router();
  *                      "GET /api/wix/signup"
  ******************************************************************************/
 
-router.get('/signup', async (req: Request, res: Response) => {
+router.get('/signup',  (req: Request, res: Response) => {
     // This route  is called before the user is asked to provide consent
     // Configure the `Redirect URL` in  Wix Developers to point here
     // *** PUT YOUR SIGNUP CODE HERE *** ///
@@ -84,7 +84,7 @@ router.get('/login', async (req, res) => {
 /******************************************************************************
  *                      "GET /api/wix/instance"
  ******************************************************************************/
-router.get('/instance', async (req, res) => {
+router.get('/instance',  (req, res) => {
     const instance = WixConfigInstance.decodeInstance(req.headers.instance as string);
     res.send(instance);
 });

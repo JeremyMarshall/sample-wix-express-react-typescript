@@ -6,6 +6,7 @@ declare global{
     namespace Express {
         interface Request {
             instance: Token
+            wixToken: string
         }
     }
 }
