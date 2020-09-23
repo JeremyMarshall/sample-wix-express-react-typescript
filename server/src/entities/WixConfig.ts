@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { Etcd3 } from 'etcd3';
+import { Etcd3, IDeleteRangeResponse } from 'etcd3';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 
@@ -149,6 +149,12 @@ class WixConfig {
 
         return tokens.access_token;
     }
+
+    public async deleteInstance(instanceId: string): Promise<IDeleteRangeResponse> {
+        console.log(`deleting ${this.appId}/${instanceId}`);
+        return await etcdClient.delete().prefix(`${this.appId}/${instanceId}`);
+    }
+
 
     public verify(data: string): WixWebhook | undefined {
         try {

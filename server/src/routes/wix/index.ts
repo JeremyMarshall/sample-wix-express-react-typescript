@@ -102,6 +102,11 @@ router.post('/webhook-callback', (req, res) => {
         console.log("===========================");
         const data = WixConfigInstance.verify(req.body);
 
+        if (data?.eventType == 'AppRemoved') {
+            WixConfigInstance.deleteInstance(data.instanceId)
+                .then( response => console.log(`deleted: ${data.instanceId} response: ${response.deleted}`));
+        }
+
         if (data) {
             console.log('webhook event data after verification:', data);
             res.status(200).send(req.body);
