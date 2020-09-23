@@ -1,9 +1,10 @@
 import axios, { AxiosResponse } from 'axios';
 import { Etcd3 } from 'etcd3';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 
 
-import { WixToken, AppInstance, Token } from '../schema'
+import { WixToken, AppInstance, Token, WixWebhook } from '../schema'
 
 const etcdClient = new Etcd3();
 
@@ -147,6 +148,23 @@ class WixConfig {
             .catch(e => console.log(`access_token error ${e}`));
 
         return tokens.access_token;
+    }
+
+    public verify(data: string): WixWebhook | undefined {
+        try {
+            const verifiedData = jwt.verify(data, this.publicKey);
+            const parsedData = JSON.parse(verifiedData.data);
+            // const parsedData2 = JSON.parse(parsedData.data);
+            const prettyData = { data: { ...parsedData, data: JSON.parse(parsedData.data) } };
+            
+            console.log(prettyData.data);
+            // console.log(parsedData2);
+            return <WixWebhook>prettyData.data;
+
+        } catch (error) {
+            console.log(error);
+            return undefined;
+        }
 
     }
 }

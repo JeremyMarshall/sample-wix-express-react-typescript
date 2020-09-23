@@ -9,6 +9,7 @@ import { WixConfigInstance } from '../../entities/';
 import { paramMissingError } from '@shared/constants';
 import { receiveMessageOnPort } from 'worker_threads';
 import Axios from 'axios';
+import bodyParser from 'body-parser';
 
 import WixPayloadRouter from './payload';
 
@@ -16,6 +17,9 @@ import WixPayloadRouter from './payload';
 const router = Router();
 // const userDao = new UserDao();
 
+router.use(bodyParser.urlencoded({extended: false}));
+router.use(bodyParser.text());
+router.use(bodyParser.json());
 
 /******************************************************************************
  *                      "GET /api/wix/signup"
@@ -76,7 +80,7 @@ router.get('/login', async (req, res) => {
     } catch (wixError) {
         console.log("Error getting token from Wix");
         console.log({ wixError });
-        res.status(500);
+        res.status(500).end();
         return;
     }
 });
@@ -88,7 +92,29 @@ router.get('/instance',  (req, res) => {
     const instance = WixConfigInstance.decodeInstance(req.headers.instance as string);
     res.send(instance);
 });
-    
+
+/******************************************************************************
+ *                      "POST /api/wix/webhook-callback"
+ ******************************************************************************/
+router.post('/webhook-callback', (req, res) => {
+    try {
+        console.log('got webhook event from Wix!', req.body);
+        console.log("===========================");
+        const data = WixConfigInstance.verify(req.body);
+
+        if (data) {
+            console.log('webhook event data after verification:', data);
+            res.status(200).send(req.body);
+        } else {
+            res.status(400).end();
+
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).end();
+    }
+  });
+
 router.use('/payload', WixPayloadRouter);
 
 export default router;

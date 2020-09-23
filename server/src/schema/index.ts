@@ -50,3 +50,18 @@ export interface Token {
   loginAccountId: string;
 }
 
+ interface WixWebhookInstance {
+   appId: string;
+   operationTimeStamp: Date;
+   vendorProductId: string;
+   cycle: string;
+   cancelReason: string;
+   userReason: string;
+   subscriptionCancellationType: string;
+}
+
+export interface WixWebhook {
+  data: WixWebhookInstance;
+  instanceId: string;
+  eventType: string;
+}
