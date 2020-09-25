@@ -1,12 +1,11 @@
-import { Token } from "src/schema";
+import { WixRequest } from "src/schema";
 
 export {};
 
 declare global{
     namespace Express {
         interface Request {
-            instance: Token
-            wixToken: string
+            wix: WixRequest
         }
     }
 }

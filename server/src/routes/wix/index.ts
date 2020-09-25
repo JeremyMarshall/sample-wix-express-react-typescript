@@ -12,6 +12,7 @@ import Axios from 'axios';
 import bodyParser from 'body-parser';
 
 import WixPayloadRouter from './payload';
+import WixWebhookRouter from './webhooks';
 
 // Init shared
 const router = Router();
@@ -93,33 +94,8 @@ router.get('/instance',  (req, res) => {
     res.send(instance);
 });
 
-/******************************************************************************
- *                      "POST /api/wix/webhook-callback"
- ******************************************************************************/
-router.post('/webhook-callback', (req, res) => {
-    try {
-        console.log('got webhook event from Wix!', req.body);
-        console.log("===========================");
-        const data = WixConfigInstance.verify(req.body);
 
-        if (data?.eventType == 'AppRemoved') {
-            WixConfigInstance.deleteInstance(data.instanceId)
-                .then( response => console.log(`deleted: ${data.instanceId} response: ${response.deleted}`));
-        }
-
-        if (data) {
-            console.log('webhook event data after verification:', data);
-            res.status(200).send(req.body);
-        } else {
-            res.status(400).end();
-
-        }
-    } catch (error) {
-        console.log(error);
-        res.status(500).end();
-    }
-  });
-
-router.use('/payload', WixPayloadRouter);
+  router.use('/payload', WixPayloadRouter);
+  router.use('/webhooks', WixWebhookRouter);
 
 export default router;

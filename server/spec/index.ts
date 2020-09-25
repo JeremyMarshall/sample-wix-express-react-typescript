@@ -40,7 +40,7 @@ jasmine.onComplete((passed: boolean) => {
     if (passed) {
         logger.info('All tests have passed :)');
     } else {
-        logger.error('At least one test has failed :(');
+        logger.info('At least one test has failed :(');
     }
 });
 
