@@ -21,7 +21,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "coverage": "nyc npm run test -- --watchAll=false",
+    "codecov": "nyc report --reporter=text-lcov > coverage.lcov"
   },
   "proxy": "http://localhost:5000",
   "homepage": "/dash/",
@@ -39,5 +41,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "typescript-coverage-report": "^0.1.3",
+    "nyc": "^15.1.0"
   }
 }

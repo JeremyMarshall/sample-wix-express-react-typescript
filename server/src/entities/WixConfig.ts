@@ -101,6 +101,7 @@ class WixConfig {
             var data = pair[1];
             // sign the data using hmac-sha1-256
             var hmac = crypto.createHmac('sha256', this.secret as string);
+            // @ts-ignore
             var newSignature = hmac.update(data).digest('binary');
 
             //   console.log(JSON.stringify(signature))
@@ -156,15 +157,18 @@ class WixConfig {
     }
 
 
+
     public verify(data: string): WixWebhook | undefined {
+        interface VerifiedData {
+            data: string
+        }
+
         try {
-            const verifiedData = jwt.verify(data, this.publicKey);
+            const verifiedData = <VerifiedData>jwt.verify(data, this.publicKey as string);
             const parsedData = JSON.parse(verifiedData.data);
-            // const parsedData2 = JSON.parse(parsedData.data);
             const prettyData = { data: { ...parsedData, data: JSON.parse(parsedData.data) } };
             
             console.log(prettyData.data);
-            // console.log(parsedData2);
             return <WixWebhook>prettyData.data;
 
         } catch (error) {

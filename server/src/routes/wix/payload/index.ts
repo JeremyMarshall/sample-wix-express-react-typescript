@@ -1,5 +1,5 @@
 import { Request, Response, Router } from 'express';
-import { Token } from 'src/schema';
+import { Token, WixRequest } from 'src/schema';
 
 import { WixConfigInstance } from '../../../entities/';
 
@@ -14,19 +14,24 @@ router.use(function (req: Request, res: Response, next: Function) {
         if (typeof instance == 'undefined') {
             res.status(403).end();
         } else {
-            req.instance = instance as Token;
+            req.wix = new WixRequest({ instance: instance });
+            req.wix.instance = instance as Token;
             next();
         }
     }
 })
 
 router.use(async function (req: Request, res: Response, next: Function) {
-    const wixToken = await WixConfigInstance.getToken(req.instance.instanceId)
-    if (typeof wixToken != 'string') {
-        res.status(403).end();
+    if (req.wix.instance) {
+        const wixToken = await WixConfigInstance.getToken(req.wix.instance.instanceId)
+        if (typeof wixToken != 'string') {
+            res.status(403).end();
+        } else {
+            req.wix.wixToken = wixToken as string;
+            next();
+        }
     } else {
-        req.wixToken = wixToken as string;
-        next();
+        res.status(403).end();
     }
 })
 
@@ -35,14 +40,14 @@ router.use(async function (req: Request, res: Response, next: Function) {
  ******************************************************************************/
 
 router.get('/instance', (req: Request, res: Response) => {
-    console.log(req.instance)
-    const payload = [req.instance];
+    console.log(req.wix.instance)
+    const payload = [req.wix.instance];
     console.log(JSON.stringify(payload));
     return res.status(200).json({payload});
 });
 
 router.get('/test2', async (req: Request, res: Response) => {
-    console.log(req.instance)
+    console.log(req.wix.instance)
     res.status(200).json("{'status':200}");
 });
 export default router;

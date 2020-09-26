@@ -50,18 +50,31 @@ export interface Token {
   loginAccountId: string;
 }
 
- interface WixWebhookInstance {
-   appId: string;
-   operationTimeStamp: Date;
-   vendorProductId: string;
-   cycle: string;
-   cancelReason: string;
-   userReason: string;
-   subscriptionCancellationType: string;
+interface WixWebhookInstance {
+  appId: string;
+  operationTimeStamp: Date;
+  vendorProductId: string;
+  cycle: string;
+  cancelReason: string;
+  userReason: string;
+  subscriptionCancellationType: string;
 }
 
 export interface WixWebhook {
   data: WixWebhookInstance;
   instanceId: string;
   eventType: string;
+}
+
+type NonMethodKeys<T> = ({ [P in keyof T]: T[P] extends Function ? never : P } & { [x: string]: never })[keyof T];
+type RemoveMethods<T> = Pick<T, NonMethodKeys<T>>;
+
+export class WixRequest {
+  public instance?: Token
+  public wixToken?: string
+  public webHook?: WixWebhook | undefined
+
+  constructor(data: RemoveMethods<WixRequest>) {
+    Object.assign(this, data);
+  }
 }

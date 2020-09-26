@@ -27,3 +27,7 @@ server/logs
 server/src/public/dash/
 
 server/env
+
+**/.nyc_output
+**/coverage.lcov
+

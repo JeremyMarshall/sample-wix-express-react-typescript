@@ -1,3 +1,6 @@
+[![codecov](https://codecov.io/gh/JeremyMarshall/sample-wix-express-react-typescript/branch/master/graph/badge.svg)](https://codecov.io/gh/JeremyMarshall/sample-wix-express-react-typescript)
+
+[![Build Status](https://travis-ci.org/JeremyMarshall/sample-wix-express-react-typescript.svg?branch=master)](https://travis-ci.org/JeremyMarshall/sample-wix-express-react-typescript)
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
