@@ -1,8 +1,8 @@
 import { Request, Response, Router } from 'express';
 import bodyParser from 'body-parser';
 
-import { WixRequest} from 'src/schema';
-import { WixConfigInstance } from '../../../entities/';
+import { WixRequest} from '@schema';
+import { WixConfigInstance } from '@entities';
 
 // Init shared
 const router = Router();

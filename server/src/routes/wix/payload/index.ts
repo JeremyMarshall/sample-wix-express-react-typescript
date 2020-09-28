@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
-import { Token, WixRequest } from 'src/schema';
+import { Token, WixRequest } from '@schema';
 
-import { WixConfigInstance } from '../../../entities/';
+import { WixConfigInstance } from '@entities';
 
 // Init shared
 const router = Router();

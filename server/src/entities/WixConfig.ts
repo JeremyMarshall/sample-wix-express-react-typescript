@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 
 
-import { WixToken, AppInstance, Token, WixWebhook } from '../schema'
+import { WixToken, AppInstance, Token, WixWebhook } from '@schema'
 
 const etcdClient = new Etcd3();
 

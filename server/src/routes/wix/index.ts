@@ -3,7 +3,7 @@ import { BAD_REQUEST, CREATED, OK } from 'http-status-codes';
 import { ParamsDictionary } from 'express-serve-static-core';
 import path from 'path';
 
-import { WixConfigInstance } from '../../entities/';
+import { WixConfigInstance } from '@entities';
 
 // import UserDao from '@daos/User/UserDao.mock';
 import { paramMissingError } from '@shared/constants';
@@ -72,11 +72,11 @@ router.get('/login', async (req, res) => {
 
         Axios.get(url)
         .then((response) => {
-            res.sendFile('thanks.html', {root: path.join(__dirname, 'views')});
+            res.sendFile('thanks.html', {root: path.join(__dirname, '../../views')});
         })
         .catch((error) => {
             console.log(error);
-            res.sendFile('error.html', {root: path.join(__dirname, 'views')});
+            res.sendFile('error.html', {root: path.join(__dirname, '../../views')});
         })
     } catch (wixError) {
         console.log("Error getting token from Wix");
