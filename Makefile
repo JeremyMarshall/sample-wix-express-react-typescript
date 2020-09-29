@@ -1,6 +1,7 @@
 
 
 DIRS := client server
+DOCKER_IMAGE ?= sample-wix-express-react-typescript
 
 
 install:
@@ -27,5 +28,10 @@ copy-client: build-client
 
 codecov:
 	codecov
+
+docker-build: build-client build-server
+	docker build -t $(DOCKER_IMAGE) server
+	
 	
 .PHONY: install test build-client build-server build copy-client codecov
+
