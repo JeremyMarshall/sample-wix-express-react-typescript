@@ -27,15 +27,15 @@ Read the sample-wix-res-app readme!
 The setup is the same with ngrok and creating an app
 
 | Wix field | value | 
-|---+---+---|
-|Redirect URL|https://<ngrok>/api/wix/login|
-|App URL|https://<ngrok>/api/wix/signup|
+| --------- | ----- |
+| Redirect URL | `https://<ngrok>/api/wix/login` |
+| App URL | `https://<ngrok>/api/wix/signup` |
 
 Add a dashboard component with URL
 https://<ngrok>/dash
   
 Add a webhook for App Management -> App removed
-https://<ngrok>/api/wix/webhooks/removed
+`https://<ngrok>/api/wix/webhooks/removed`
   
 ## Environment
 
@@ -77,6 +77,7 @@ Better documentation
 fix the deprecated packages
 write some actual tests
 make some nice react components
+the docker image can't get to the etcd server on a mac
   
  
 
