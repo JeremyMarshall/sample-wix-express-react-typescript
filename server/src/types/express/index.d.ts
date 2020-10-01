@@ -1,4 +1,4 @@
-import { WixRequest } from "src/schema";
+import { WixRequest } from '@schema';
 
 export {};
 
