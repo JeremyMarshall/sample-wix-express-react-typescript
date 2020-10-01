@@ -57,7 +57,7 @@ And a similar one for production
 
 ## Etcd
 
-Áou will need an etcd server to keep track of the refresh tokens for your users.
+You will need an etcd server to keep track of the refresh tokens for your users.
 
 ## How it works
 
@@ -73,11 +73,11 @@ There is a working travis plan and a codecov coverage plan
 
 ## TODO
 
-Better documentation
-fix the deprecated packages
-write some actual tests
-make some nice react components
-the docker image can't get to the etcd server on a mac
+* Better documentation
+* fix the deprecated packages
+* write some actual tests
+* make some nice react components
+* the docker image can't get to the etcd server on a mac
   
  
 
