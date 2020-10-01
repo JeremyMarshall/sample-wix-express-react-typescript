@@ -1,51 +1,84 @@
 [![codecov](https://codecov.io/gh/JeremyMarshall/sample-wix-express-react-typescript/branch/master/graph/badge.svg)](https://codecov.io/gh/JeremyMarshall/sample-wix-express-react-typescript)
-
 [![Build Status](https://travis-ci.org/JeremyMarshall/sample-wix-express-react-typescript.svg?branch=master)](https://travis-ci.org/JeremyMarshall/sample-wix-express-react-typescript)
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+# sample-wix-express-react-typescript
 
-In the project directory, you can run:
+This is an evolution of the [sample wix rest app](https://github.com/wix-incubator/sample-wix-rest-app.git)
 
-### `yarn start`
+It differs in that it has a react front end and an express backend. The whole thing is [typescript](https://www.typescriptlang.org)
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+It is split into two 
+* [client](./client) which is react
+* [server](./server) which is express
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+The react part is built separately and served by the server via the static directory
 
-### `yarn test`
+Or you can run the client on port 3000 and the server on port 5000 and the client will proxy to the server
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+There is a [Makefile](./Makefile) to test, build and create a docker image
 
-### `yarn build`
+You can also run the `npm` commands from the subdirectories
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Configuration
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+Read the sample-wix-res-app readme!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+The setup is the same with ngrok and creating an app
 
-### `yarn eject`
+| Wix field | value | 
+|---+---+---|
+|Redirect URL|https://<ngrok>/api/wix/login|
+|App URL|https://<ngrok>/api/wix/signup|
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Add a dashboard component with URL
+https://<ngrok>/dash
+  
+Add a webhook for App Management -> App removed
+https://<ngrok>/api/wix/webhooks/removed
+  
+## Environment
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+You will need a file in server/env/development.env
+```
+# Environment
+NODE_ENV=development
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+# Server
+PORT=5000
+HOST=localhost
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+# WIX
+APP_ID=<app key in wix>
+PUBLIC_KEY=<base64 encoded wix public key>
+SECRET=<secret>
+```
+And a similar one for production
 
-## Learn More
+## Etcd
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Áou will need an etcd server to keep track of the refresh tokens for your users.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## How it works
+
+Wix sends an instance token when your uses call your app
+
+This uses that token as a header to the rest calls to serve data
+
+That token is used to find the instance, then the refresh token then a JSON token to validate requests
+
+## CI
+
+There is a working travis plan and a codecov coverage plan
+
+## TODO
+
+Better documentation
+fix the deprecated packages
+write some actual tests
+make some nice react components
+  
+ 
 
 
----
-docker run -ti -p 5000:5000 -v ./env:/app/env -e ETCD_ADDR=docker.for.mac.localhost 2333318f044e
+
