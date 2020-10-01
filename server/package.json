@@ -31,7 +31,7 @@
     "@schema": "dist/schema",
     "@shared": "dist/shared",
     "@server": "dist/Server",
-    "@types": "dist/@types"
+    "@types": "dist/types"
   },
   "dependencies": {
     "@types/jsonwebtoken": "^8.5.0",
