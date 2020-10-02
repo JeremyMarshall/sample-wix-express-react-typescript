@@ -1,5 +1,7 @@
 
 FILES := $(shell find src -name '*.ts*' )
+DOCKER_IMAGE ?= sample-wix-express-react-typescript
+DOCKERID := docker.id
 
 
 build: dist/index.js
@@ -19,7 +21,12 @@ install: package-lock.json
 test: coverage.lcov
 
 clean:
-	rm -fr dist
+	rm -fr dist $(DOCKERID)
+
+docker-build: $(DOCKERID)
+
+$(DOCKERID): dist/index.js
+	docker build --iidfile $(DOCKERID) -t $(DOCKER_IMAGE) .
 	
-.PHONY: install  build test clean
+.PHONY: build install test clean docker-build
 

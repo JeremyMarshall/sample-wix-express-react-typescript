@@ -27,6 +27,7 @@ server/logs
 server/src/public/dash/
 
 server/env
+server/docker.id
 
 **/.nyc_output
 **/coverage.lcov

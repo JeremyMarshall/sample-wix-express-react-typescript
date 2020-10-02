@@ -26,13 +26,14 @@ copy-client: build-client
 codecov:
 	codecov
 
-docker-build: build-client build-server
-	docker build -t $(DOCKER_IMAGE) server
+docker-build: copy-client build-server
+	$(MAKE) -C server docker-build
+	
 	
 clean:
 	$(MAKE) -C client clean
 	$(MAKE) -C server clean
 
 	
-.PHONY: install test build build-client copy-client build-server codecov clean
+.PHONY: install test build build-client copy-client build-server codecov clean docker-build
 
