@@ -1,26 +1,23 @@
 
 
-DIRS := client server
 DOCKER_IMAGE ?= sample-wix-express-react-typescript
 
+build: copy-client build-server
 
 install:
-	npm install --prefix client
-	npm install --prefix server
+	$(MAKE) -C client install
+	$(MAKE) -C server install
 
 test:
-	npm run coverage --prefix client
-	npm run codecov --prefix client
-	npm run coverage --prefix server
-	npm run codecov --prefix server
+	$(MAKE) -C client test
+	$(MAKE) -C server test
 
 build-client:
-	npm run build --prefix client
+	$(MAKE) -C client build
 
 build-server:
-	npm run build --prefix server
+	$(MAKE) -C server build
 
-build: copy-client build-server
 
 copy-client: build-client
 	rm -fr server/src/public/dash
@@ -29,9 +26,14 @@ copy-client: build-client
 codecov:
 	codecov
 
-docker-build: build-client build-server
-	docker build -t $(DOCKER_IMAGE) server
+docker-build: copy-client build-server
+	$(MAKE) -C server docker-build
 	
 	
-.PHONY: install test build-client build-server build copy-client codecov
+clean:
+	$(MAKE) -C client clean
+	$(MAKE) -C server clean
+
+	
+.PHONY: install test build build-client copy-client build-server codecov clean docker-build
 
