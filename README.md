@@ -32,7 +32,7 @@ The setup is the same with ngrok and creating an app
 | App URL | `https://<ngrok>/api/wix/signup` |
 
 Add a dashboard component with URL
-https://<ngrok>/dash
+`https://<ngrok>/dash`
   
 Add a webhook for App Management -> App removed
 `https://<ngrok>/api/wix/webhooks/removed`
